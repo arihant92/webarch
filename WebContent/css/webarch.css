@@ -1,0 +1,15 @@
+img {
+	cursor: pointer;
+}
+
+a {
+	cursor: pointer;
+}
+
+#text-input{
+	position: fixed;
+	top: 0px;
+	left: 0px;
+	display:none;
+}
+

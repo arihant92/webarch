@@ -1,0 +1,18 @@
+<html>
+<head>
+  <script src="https://d3js.org/d3.v4.0.0-alpha.44.min.js"></script>
+<title>Lines</title>
+</head>
+
+<body>
+
+  <canvas id="svg" width="300" height="300"></canvas>
+
+<script>
+var document= d3.select("svg");
+var draw= document.append("line").attr("x1",10).attr("x2",10).attr("y1",60).attr("y2",80).attr("stroke-width",5)
+                                  .attr("stroke",red);
+  
+</script>
+</body>
+</html>
