@@ -125,6 +125,9 @@ Figure.prototype.move = function(d){
 		obj.attr("x", d.x).attr("y", d.y);
 
 		webarch.moveElement(obj, d.x, d.y);
+		//console.log(d.x);
+		myglobal.moveflag=true;
+		//console.log("moving");
 		}
 
 }

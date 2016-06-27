@@ -144,6 +144,9 @@ var emit_y2=data.y2;
 var new_id=data.id;
 var try_obj = new trycapture;
 //console.log(try_obj);
+
+
+
 drawAggregate(emit_x1,emit_y1,emit_x2,emit_y2,new_id);
 
  });

@@ -6,7 +6,9 @@ var path = require('path');
 global_array =[];
 global_paths=[];
 global_text=[];
-session=Math.floor(Math.random()*90000) + 10000;
+global_move={};
+
+//session=Math.floor(Math.random()*90000) + 10000;
 
 
 var ip = process.env.OPENSHIFT_NODEJS_IP  || 'localhost';
@@ -48,9 +50,10 @@ var outgoingEmits = [];
 	io.on('connection', function(socket){
 		socket.on('event', function(data){
 			console.log('connection established');
-			socket.emit('initialize array', global_array);
+			socket.emit('initialize array', global_array,global_move);
 			socket.emit('initialize path', global_paths);
 				socket.emit('initialize text', global_text);
+	      socket.emit('initialize move', global_move);
 				//console.log(global_paths);
 		});
 		socket.on('change', function(data){
@@ -60,21 +63,49 @@ var outgoingEmits = [];
 
 		});
 
+
+		socket.on('new', function(data){
+				socket.emit('initialize path', global_paths);
+
+		});
+
+
 		socket.on('move', function(data){
 			socket.broadcast.emit('move', data);
-			console.log(data);
+
+
+
+
+			//console.log(id,x,y);
 		});
 
 		socket.on('make-path', function(msg){
 	     socket.broadcast.emit('make-path', msg);
 			 //console.log(msg);
 			 	global_paths.push(msg);
+					//socket.emit('initialize path array', global_paths,rdata.id,rdata.x,rdata.y);
+
+
 	   });
+socket.on('redraw',function(rdata){
+	socket.emit('initialize path array', global_paths,rdata.id,rdata.x,rdata.y);
+
+});
+
+socket.on('initialize move',function(data){
+	var id=data.id;
+				global_move[id]={id:data.id,d:data.d,x:data.x,y:data.y};
+	console.log(global_move);
+});
+
+
 
 
 		socket.on('mousedown', function (data) {
 			socket.broadcast.emit('mousedown', data);
+			//console.log(data);
 		});
+
 
 		socket.on('text-change', function(data){
 			socket.broadcast.emit('text-change', data);

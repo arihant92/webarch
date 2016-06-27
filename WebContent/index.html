@@ -15,6 +15,11 @@
   var global_array=[];
   var global_paths=[];
   var global_text=[];
+  var redraw_path=[];
+  var global_move={};
+
+
+
 
 </script>
   <script src="https://togetherjs.com/togetherjs-min.js"></script>
@@ -377,7 +382,7 @@
 	<!-- Archimate Files -->
   <script src="js/archimate/Figure.js"></script>
 	<script src="js/archimate/webarch.js"></script>
-  <script src="trycapture.js"></script>
+
 
 
 	<script src="js/archimate/BusinessContractFigure.js"></script>
@@ -389,57 +394,180 @@
   <script src="js/archimate/persistence.js"></script>
 
 	<script src="js/main.js"></script>
-  <button onclick="TogetherJS(this); return false;">Start Collaboration</button>
-
-<div id="1" height="200" width="200">asdasdfasdF</div>
-
-<div id="2" height="200" width="200" style="margin:30px">22222222asdasdfasdF</div>
-
+  <button onclick="TogetherJS(this); return false;">Collaborate</button>
 <script type="text/javascript">
 
+
+  socket
+    .on('initialize path', function (initial_global_path) {
+      //global_paths =[];
+      global_paths = initial_global_path;
+      //console.log(global_paths);
+
+
+      //var try_obj = new trycapture;//instead of object of whole function just create object of draw function
+      if(global_paths==''){}else{
+        for (var i=0;i<global_paths.length;i++)
+      { //var try_obj = new drawAggregate(1,2,3,4,'asd');
+
+    // if(screen_relations.find(global_paths[i])==undefined)
+      drawAggregate(global_paths[i].x1,global_paths[i].y1,global_paths[i].x2,global_paths[i].y2,global_paths[i].id);
+
+
+  }
+ }
+
+    })
+
+
+    socket
+      .on('initialize path array', function (initial_global_path,id,x,y) {
+         redraw_path=initial_global_path;
+         redraw(id,x,y);
+      console.log("in new emit",redraw_path);
+        var relations_on_canvas = document.getElementsByTagName('path');
+        //console.log(document.getElementsByTagName('path'));
+        var screen_relations=[];
+        //for (var z=0;z<redraw_canvas.length; z++)
+        //{
+          //screen_relations.push(relations_on_canvas[z].getAttribute('id'));
+        //}
+
+      })
+
+  </script>
+<script src="trycapture.js"></script>
+<script type="text/javascript">
+var global_obj=[];
+
+//console.log(global_obj);
+
+
 socket
-  .on('initialize array', function (initial_global_array) {
+  .on('initialize array', function (initial_global_array,initial_global_move) {
     global_array = initial_global_array;
+    global_move = initial_global_move;
+    //console.log("moving array",global_move);
+
+var c = d3.select("#main_svg");
+      socket
+      .on('initialize move',function(data){
+        //console.log(global_move);
+
+      var moves_length=Object.keys(global_move).length;
+      //console.log(moves_length);
+      for(var i=0;i<moves_length;i++)
+      {
+        key =(Object.keys(data)[i]);
+      global_obj.push(key);
+       //console.log(global_obj);
+      var x=global_move[key].x;
+      var y=global_move[key].y;
+
+     BusinessProductFigure.prototype.addTo(c,x,y,key);
+      }//moves for loop
+
+
+})//moves
+
+
+console.log(global_obj);
+
+
+
+
     parser = new DOMParser();
-    console.log(global_array);
+    //console.log(global_array);
     for(var i=0; i<global_array.length; i++){
     var doc = parser.parseFromString(global_array[i].obj, "image/svg+xml");
-    console.log(i);
+    //console.log(i);
     var type = doc.getElementsByTagName('svg')[0].getAttribute("data");
     var x = doc.getElementsByTagName('svg')[0].getAttribute("x");
     var y = doc.getElementsByTagName('svg')[0].getAttribute("y");
     var id = doc.getElementsByTagName('svg')[0].getAttribute("id");
     if(type == "BusinessProductFigure"){
-      var c = d3.select("#main_svg");
+
+
       BusinessProductFigure.prototype.addTo(c,x,y,id);
+
+
+      //console.log(arrayObjectIndexOfall(global_move, id, "id"));
     }
   }//EOF for loop
-  })
 
-  socket
-    .on('initialize path', function (initial_global_path) {
-      global_paths = initial_global_path;
-      //console.log(global_paths);
-      //var try_obj = new trycapture;//instead of object of whole function just create object of draw function
-      if(global_paths==''){}else{
-        for (var i=0;i<global_paths.length;i++)
-      { //var try_obj = new drawAggregate(1,2,3,4,'asd');
-      drawAggregate(global_paths[i].x1,global_paths[i].y1,global_paths[i].x2,global_paths[i].y2,global_paths[i].id);
-  }
-}
-    })
+
+})
+
+
+
+
 
     socket
       .on('initialize text', function (initial_global_text) {
         global_text = initial_global_text;
-        //console.log(global_text);
-        if(global_paths==''){}else{
+    var obj = {}, unique_global_text = [];
+
+// in the end the last unique object will be considered
+global_text.forEach(function(v){
+    obj[v['id']] = v;
+});
+unique_global_text = Object.keys(obj).map(function(id) { return obj[id]; });
+//console.log(new_arr);
+//console.log(JSON.stringify(new_arr, 0, 4));
+
+//////////////////////////////////////////////
+        if(global_text==''){}else{
+          for(var i=0;i<unique_global_text.length; i++){
+            //console.log(unique_global_text[i].id);
+          //  var j=arrayObjectIndexOf(global_text, global_text[i].id, "id"); //
+//console.log(j);
+//if(j!=-1)
+createSVGtext(d3.select("#"+unique_global_text[i].id), unique_global_text[i].text, unique_global_text[i].coords.x, unique_global_text[i].coords.y);
+/*
+         d3.select("#"+unique_global_text[i].id).append("text")
+          .text(unique_global_text[i].text)
+          .attr("x",unique_global_text[i].coords.x-20)
+          .attr("y",unique_global_text[i].coords.y);*/
+
+        }
          //console.log(global_text);
         // webarch.createSVGtext(global_text[0].id, global_text[0].text, global_text[0].coords.x, global_text[0].coords.y);
         //var try_obj = new trycapture;
         //if(global_paths==''){}else{
         //try_obj.drawAggregate(global_paths[0].x1,global_paths[0].y1,global_paths[0].x2,global_paths[0].y2,global_paths[0].id);}
       }})
+just_moved='';
+//Trying to move paths around
+
+
+function redrawrelations(id,x,y){
+var x_value= document.getElementsByTagName("svg")[id].getAttribute("x");
+}
+
+      function arrayObjectIndexOf(myArray, searchTerm, property) {
+          for(var i = myArray.length-1, len = 0; i => len; i--) {
+            //console.log(i);
+            //console.log(myArray[i][property],searchTerm);
+              if (myArray[i][property] === searchTerm) return i;
+          }
+          return -1;
+      }
+
+      function arrayObjectIndexOfall(myArray, searchTerm, property) {
+        var arrayoftoelements=[];
+          for(var i = myArray.length-1, len = 0; i >= len; i--) {
+            //console.log(i);
+            //console.log(myArray[i][property],searchTerm);
+
+              if (myArray[i][property] === searchTerm)
+              {
+                arrayoftoelements.push(i);
+              }
+
+          }
+          return arrayoftoelements;
+      }
+
 
 
 </script>

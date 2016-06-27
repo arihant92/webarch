@@ -11,7 +11,6 @@ linea.prototype.getTextCoords = function(){
     var coords = null;
 
   }
-
 function trycapture(){
 
 
@@ -27,24 +26,6 @@ function distance(x,y,x0,y0){
 return path_length;
 }
 
-    function getCoordinates(id){
-
-      scroll_value_Y=document.getElementById("svg_editor").scrollTop;
-      scroll_value_X=document.getElementById("svg_editor").scrollLeft;
-
-      offset_x=250;
-      offset_y=147;
-        var p = $('#'+id);
-        var offset = p.offset();
-        var left=Math.round(offset.left-offset_x+scroll_value_X);
-        var top= offset.top-offset_y+scroll_value_Y;
-
-        return {
-              top: top,
-              left: left
-            }
-
-    }
 
 
 function deletepath(){
@@ -61,6 +42,100 @@ function deletepath(){
 
 }
 
+
+
+
+
+getdiv1();
+coordinates = [];
+id_index=[];
+function getdiv1(){
+  $("svg").one("click", function() {
+    if(this.id!='main_svg')   //condition
+    {
+    a1=this.id;
+  //  alert(a1);
+var   x_value=this.x.baseVal.value ;
+var  y_value=this.y.baseVal.value ;
+
+  //console.log(x_value);
+    //console.log(y_value);
+
+a1coords=getCoordinates(a1,x_value,y_value);
+    $('svg').unbind('click');
+    getdiv2();
+      //anchorCoordinates(a1);
+   }
+  });
+
+  }
+
+
+//second
+function getdiv2(){
+  $("svg").one("click", function() {
+    if(this.id!='main_svg')   {
+    a2=this.id;
+      $('svg').unbind('click');
+      var   x_value=this.x.baseVal.value ;
+      var  y_value=this.y.baseVal.value ;
+    a2coords= getCoordinates(a2,x_value,y_value);
+
+
+    anchor1=anchorCoordinates(a1,a1coords);
+    anchor2=anchorCoordinates(a2,a2coords);
+
+    var element_1 = new Array([anchor1.anchor1_x,anchor1.anchor1_y],[anchor1.anchor2_x,anchor1.anchor2_y],[anchor1.anchor3_x,anchor1.anchor3_y],[anchor1.anchor4_x,anchor1.anchor4_y]);
+    var element_2 = new Array([anchor2.anchor1_x,anchor2.anchor1_y],[anchor2.anchor2_x,anchor2.anchor2_y],[anchor2.anchor3_x,anchor2.anchor3_y],[anchor2.anchor4_x,anchor2.anchor4_y]);
+
+
+
+    var closest = {a: false, b: false, distance: false};
+
+    for(var i=0; i<element_1.length; i++) {
+      for(var j=0; j<element_2.length; j++) {
+        var distance = calculate_distance(element_1[i], element_2[j]);
+        //console.log('Distance between element_1['+i+'] and element_2['+j+']: ' + distance);
+        if(closest.distance === false || distance < closest.distance) {
+           closest = {a: element_1[i], b: element_2[j], distance: distance};
+        }
+      }
+    }
+
+
+    //emit_coordinate_x1=closest.a[0];
+    //emit_coordinate_y1=closest.a[1];
+    //emit_coordinate_x2=closest.b[0];
+    //  emit_coordinate_y2=closest.b[1];
+
+
+
+    //console.log('The shotest path is between '+closest.a[0]+' and '+closest.b+', which is '+closest.distance);
+
+    function calculate_distance(a, b) {
+    var width  = Math.abs( a[0] - b[0] ),
+      height = Math.abs( a[1] - b[1] ),
+      hypothenuse = Math.sqrt( width*width + height*height );
+    return hypothenuse;
+    }
+
+
+//console.log("drawing coordinates "+ closest.a[0],closest.a[1],closest.b[0],closest.b[1]);
+ drawAggregate(closest.a[0],closest.a[1],closest.b[0],closest.b[1]);
+ socket.emit('make-path',{ id:drawAggregate.new_id, x1: closest.a[0], y1:closest.a[1] ,x2:closest.b[0],y2: closest.b[1] ,path_type:"aggregate",from:a1,to:a2});
+ Mousetrap.bind('command+e', function(e) {
+     drawAggregate(closest.b[0],closest.b[1],closest.a[0],closest.a[1]);
+ });
+    }
+  });
+
+}
+
+//get outer box coordinates
+
+
+
+}//main end
 
 function drawAggregate(x1,y1,x2,y2,id)
   {
@@ -112,121 +187,59 @@ var new_id="aggregation"+GUID();
                                                        .attr('stroke','black')
                                                        .attr('fill', 'none');
 
-return new_id;
 
 
 
   }
-this.drawAggregate = drawAggregate;
 
-getdiv1();
-coordinates = [];
-id_index=[];
-function getdiv1(){
-  $("svg").one("click", function() {
-    if(this.id!='main_svg')   //condition
-    {
-    a1=this.id;
-  //  alert(a1);
+  function anchorCoordinates(id,which){
 
-a1coords=getCoordinates(a1);
-    $('svg').unbind('click');
-    getdiv2();
-      //anchorCoordinates(a1);
-   }
-  });
+  var width = Math.round(document.getElementById(id).getBBox().width);
+  var height = Math.round(document.getElementById(id).getBBox().height);
 
+  var anchor1_x=(which.left+(width/2));
+  var anchor1_y=which.top;
+  var anchor2_x=which.left+width;
+  var anchor2_y=(which.top+(height/2));
+  var anchor3_x=anchor1_x;
+  var anchor3_y=anchor1_y+height;
+  var anchor4_x=which.left;
+  var anchor4_y=anchor2_y;
+
+
+
+  return{
+
+            anchor1_x:anchor1_x,
+            anchor1_y:anchor1_y,
+            anchor2_x:anchor2_x,
+            anchor2_y:anchor2_y,
+            anchor3_x:anchor3_x,
+            anchor3_y:anchor3_y,
+            anchor4_x:anchor4_x,
+            anchor4_y:anchor4_y
+
+          }
   }
 
 
-//second
-function getdiv2(){
-  $("svg").one("click", function() {
-    if(this.id!='main_svg')   {
-    a2=this.id;
-      $('svg').unbind('click');
-    a2coords= getCoordinates(a2);
+      function getCoordinates(id,x,y){
 
-    anchor1=anchorCoordinates(a1,a1coords);
-    anchor2=anchorCoordinates(a2,a2coords);
-    var element_1 = new Array([anchor1.anchor1_x,anchor1.anchor1_y],[anchor1.anchor2_x,anchor1.anchor2_y],[anchor1.anchor3_x,anchor1.anchor3_y],[anchor1.anchor4_x,anchor1.anchor4_y]);
-    var element_2 = new Array([anchor2.anchor1_x,anchor2.anchor1_y],[anchor2.anchor2_x,anchor2.anchor2_y],[anchor2.anchor3_x,anchor2.anchor3_y],[anchor2.anchor4_x,anchor2.anchor4_y]);
+        scroll_value_Y=document.getElementById("svg_editor").scrollTop;
+        scroll_value_X=document.getElementById("svg_editor").scrollLeft;
 
-    var closest = {a: false, b: false, distance: false};
+        offset_x=250;
+        offset_y=147;
+          var p = $('#'+id);
+          var offset = p.offset();
+          var left=(offset.left-offset_x+scroll_value_X);//problem is here
+          var top= offset.top-offset_y+scroll_value_Y;//problem is here
+  //console.log("left here"+left);
+          return {
+                top: y,
+                left: x
+              }
 
-    for(var i=0; i<element_1.length; i++) {
-      for(var j=0; j<element_2.length; j++) {
-        var distance = calculate_distance(element_1[i], element_2[j]);
-        //console.log('Distance between element_1['+i+'] and element_2['+j+']: ' + distance);
-        if(closest.distance === false || distance < closest.distance) {
-          closest = {a: element_1[i], b: element_2[j], distance: distance};
-        }
       }
-    }
 
-
-    emit_coordinate_x1=closest.a[0];
-    emit_coordinate_y1=closest.a[1];
-    emit_coordinate_x2=closest.b[0];
-    emit_coordinate_y2=closest.b[1];
-
-
-
-    //console.log('The shotest path is between '+closest.a[0]+' and '+closest.b+', which is '+closest.distance);
-
-function calculate_distance(a, b) {
-  var width  = Math.abs( a[0] - b[0] ),
-      height = Math.abs( a[1] - b[1] ),
-      hypothenuse = Math.sqrt( width*width + height*height );
-  return hypothenuse;
-
-
-}
-
-
- var new_id=drawAggregate(closest.a[0],closest.a[1],closest.b[0]-10,closest.b[1]);
- socket.emit('make-path',{ id:new_id, x1: closest.a[0], y1:closest.a[1] ,x2:closest.b[0],y2: closest.b[1] ,path_type:"aggregate"});
- Mousetrap.bind('command+e', function(e) {
-     drawAggregate(closest.b[0],closest.b[1],closest.a[0]-10,closest.a[1]);
- });
-
-//deletepath();
-    }
-  });
-
-}
-
-//get outer box coordinates
-
-function anchorCoordinates(id,which){
-
-var width = Math.round(document.getElementById(id).getBBox().width);
-var height = Math.round(document.getElementById(id).getBBox().height);
-
-var anchor1_x=(which.left+(width/2));
-var anchor1_y=which.top;
-var anchor2_x=which.left+width;
-var anchor2_y=(which.top+(height/2));
-var anchor3_x=anchor1_x;
-var anchor3_y=anchor1_y+height;
-var anchor4_x=which.left;
-var anchor4_y=anchor2_y;
-
-
-
-return{
-
-          anchor1_x:anchor1_x,
-          anchor1_y:anchor1_y,
-          anchor2_x:anchor2_x,
-          anchor2_y:anchor2_y,
-          anchor3_x:anchor3_x,
-          anchor3_y:anchor3_y,
-          anchor4_x:anchor4_x,
-          anchor4_y:anchor4_y
-
-        }
-}
-
-
-}//main end
+//this.drawAggregate = drawAggregate;

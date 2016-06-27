@@ -44,6 +44,11 @@ WebArch.prototype.processTextChange = function(d){
 //	Process an incoming move from the server
 //
 WebArch.prototype.processMove = function(d){
+   if(d.d!=undefined){
+//relation
+document.getElementById(d.id).setAttribute("d",d.d);
+
+	 }else{
 	var obj = d3.select("#" + d.id);
 	if(obj){
 		var trans = obj.transition();
@@ -52,6 +57,8 @@ WebArch.prototype.processMove = function(d){
 	}else{
 		console.log('ERROR: Cannot find ' + d);
 	}
+}
+
 }
 
 //

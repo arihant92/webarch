@@ -8,18 +8,42 @@ function BusinessProductFigure() {
 
 }
 
-
+myglobal={};
 
 bpx=[];
 bpy=[];
 
 BusinessProductFigure.prototype.addTo = function(c, x0, y0, id) {
-//console.log(c);
+//socket.emit("initial_global_path",global_paths);
 	var n = d3.select(this);
-
+	var wasMoved = false;
 	var dragger = d3.behavior.drag()
 		.origin(function(d){return d;})
-		.on("drag", this.move);
+		.on("drag", this.move)
+		.on("dragend", dropHandler)
+
+
+
+			      function dropHandler(d) {
+			          if (myglobal.moveflag==true) {
+			              //console.log("dropped");
+			              myglobal.moveflag = false;
+										socket.emit("redraw",{id:this.id,x:this.x.baseVal.value,y:this.y.baseVal.value});
+										socket.emit("initialize move",{id:this.id,x:this.x.baseVal.value,y:this.y.baseVal.value})
+											//redraw(this.id,this.x.baseVal.value,this.y.baseVal.value);
+
+			          } else {
+			              //console.log("clicked");
+			          }
+			      }
+
+
+
+//alert("evenonclick");
+
+
+			//console.log(this.x.baseVal.value);
+
 //var f = c.append("div").attr("id","wassup");
 	var g = c.append("svg").call(dragger).data([{x:x0, y:y0}]);
 //global_array.push(["BusinessProductFigure",x0,y0,8888]);
@@ -59,6 +83,7 @@ BusinessProductFigure.prototype.paint = function(g){
 		.attr("fill", "rgb(299,299,162)")
 		.attr("stroke-linejoin", "round")
 		.attr("stroke", "rgb(299,299,162)")
+		.attr("z-index", 2)
 		.attr("stroke-width", "1");
 	g.append("rect")
 		.attr("x", 60 + BusinessProductFigure.OFFSET)
