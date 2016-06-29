@@ -73,16 +73,18 @@ var outgoingEmits = [];
 		socket.on('move', function(data){
 			socket.broadcast.emit('move', data);
 
+		});
+		socket.on('update redraw', function(data){
+			if(global_paths[data.location]!=undefined)
+global_paths[data.location].d=data.d;
 
-
-
-			//console.log(id,x,y);
 		});
 
 		socket.on('make-path', function(msg){
 	     socket.broadcast.emit('make-path', msg);
 			 //console.log(msg);
 			 	global_paths.push(msg);
+				//console.log(global_paths);
 					//socket.emit('initialize path array', global_paths,rdata.id,rdata.x,rdata.y);
 
 
@@ -95,7 +97,8 @@ socket.on('redraw',function(rdata){
 socket.on('initialize move',function(data){
 	var id=data.id;
 				global_move[id]={id:data.id,d:data.d,x:data.x,y:data.y};
-	console.log(global_move);
+	//console.log(global_move);
+
 });
 
 
@@ -103,6 +106,21 @@ socket.on('initialize move',function(data){
 
 		socket.on('mousedown', function (data) {
 			socket.broadcast.emit('mousedown', data);
+			//console.log(data);
+		});
+
+		socket.on('clear', function () {
+
+			global_move={};
+			global_array=[];
+			global_text=[];
+			global_paths=[];
+			global_obj={};
+			socket.emit('initialize array', global_array);
+			socket.emit('initialize path', global_paths);
+				socket.emit('initialize text', global_text);
+	      socket.emit('initialize move', global_move);
+				console.log("clear");
 			//console.log(data);
 		});
 

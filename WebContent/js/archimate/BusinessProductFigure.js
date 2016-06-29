@@ -83,7 +83,7 @@ BusinessProductFigure.prototype.paint = function(g){
 		.attr("fill", "rgb(299,299,162)")
 		.attr("stroke-linejoin", "round")
 		.attr("stroke", "rgb(299,299,162)")
-		.attr("z-index", 2)
+		.attr("z-index", 1)
 		.attr("stroke-width", "1");
 	g.append("rect")
 		.attr("x", 60 + BusinessProductFigure.OFFSET)

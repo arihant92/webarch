@@ -1,3 +1,5 @@
+//fine contains main functions and have to rewrite everything to maintain "object" perspecetive
+
 linea.prototype= new Figure();
 linea.prototype.constructor = linea;
 
@@ -131,9 +133,16 @@ function drawing_instructions(element_1,element_2,a1,a2)
 
 var path_id=GUID();
 drawAggregate(closest.a[0],closest.a[1],closest.b[0],closest.b[1],path_id,a1,a2);
+//////
+var lineData = [ { "x": closest.a[0],   "y": closest.a[1]},{ "x": closest.b[0],   "y":closest.b[1]}];
+
+var lineFunction = d3.svg.line()
+                         .x(function(d) { return d.x; })
+                        .y(function(d) { return d.y; })
+                        .interpolate("step");
 //emitting path to server
 //repeating
-socket.emit('make-path',{ id:drawAggregate.new_id, x1: closest.a[0], y1:closest.a[1] ,x2:closest.b[0],y2: closest.b[1] ,path_type:"aggregate",from:a1,to:a2,id:path_id});
+socket.emit('make-path',{ id:drawAggregate.new_id, x1: closest.a[0], y1:closest.a[1] ,x2:closest.b[0],y2: closest.b[1] ,path_type:"aggregate",from:a1,to:a2,id:path_id,d:lineFunction(lineData)});
 
 Mousetrap.bind('command+e', function(e) {
    drawAggregate(closest.b[0],closest.b[1],closest.a[0],closest.a[1]);
@@ -160,7 +169,7 @@ function drawAggregate(x1,y1,x2,y2,id,a1,a2)
                                           .attr("fill", "none")
                                           .attr("id",id)
                                           .attr('etype', 'path')
-                                          .attr('z-index', 1)
+                                          .attr('z-index', 3)
                                           .attr("display","block")
                                           .attr("data", "linea")	.style('marker-end', "url(#end-arrow)")
                                           .on("dblclick", linea.prototype.editText);
@@ -292,14 +301,9 @@ var lineFunction = d3.svg.line()
   var lineData = [ { "x": closest.a[0],   "y": closest.a[1]},{ "x": closest.b[0],   "y":closest.b[1]}];
   //console.log(position);
   document.getElementById(redraw_path[position[counter]].id).setAttribute("d",lineFunction(lineData));
-  //console.log(global_paths[position[counter]].x1);
-  //console.log(global_paths[position[counter]].x1=closest.a[0]);
-  //global_paths[position[counter]].y2=closest.a[1];
-  //global_paths[position[counter]].x2=closest.a[0];
-  //global_paths[position[counter]].y2=closest.a[1];
   socket.emit('move',{id:redraw_path[position[counter]].id,d:lineFunction(lineData)});
-
-
+var chanhge_location=(arrayObjectIndexOfall(global_paths,redraw_path[position[counter]].id,"id"));
+socket.emit('update redraw',{location:chanhge_location, d:lineFunction(lineData)});
     }// for loop end
 }
 
@@ -353,14 +357,11 @@ var lineFunction = d3.svg.line()
 var lineData = [ { "x": closest.a[0],   "y": closest.a[1]},{ "x": closest.b[0],   "y":closest.b[1]}];
 //console.log(position);
 document.getElementById(redraw_path[position[counter]].id).setAttribute("d",lineFunction(lineData));
-//console.log(global_paths[position[counter]].x1);
-//console.log(global_paths[position[counter]].x1=closest.a[0]);
-//global_paths[position[counter]].y2=closest.a[1];
-//global_paths[position[counter]].x2=closest.a[0];
-//global_paths[position[counter]].y2=closest.a[1];
 socket.emit('move',{id:redraw_path[position[counter]].id,d:lineFunction(lineData)});
-
-
+var chanhge_location=(arrayObjectIndexOfall(global_paths,redraw_path[position[counter]].id,"id"));
+//console.log(global_paths[chanhge_location].d=lineFunction(lineData));
+//console.log("update redraw");
+socket.emit('update redraw',{location:chanhge_location, d:lineFunction(lineData)});
 }// for loop end
 }
 

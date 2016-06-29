@@ -395,8 +395,13 @@
 
 	<script src="js/main.js"></script>
   <button onclick="TogetherJS(this); return false;">Collaborate</button>
+  <button id="clear" >Clear Canvas</button>
 <script type="text/javascript">
+document.getElementById("clear").onclick= function(){
+socket.emit("clear");
+location.reload();
 
+}
 
   socket
     .on('initialize path', function (initial_global_path) {
@@ -412,7 +417,10 @@
 
     // if(screen_relations.find(global_paths[i])==undefined)
       drawAggregate(global_paths[i].x1,global_paths[i].y1,global_paths[i].x2,global_paths[i].y2,global_paths[i].id);
-
+if(global_paths[i].d!=undefined)
+{
+console.log(  document.getElementById(global_paths[i].id).setAttribute("d",global_paths[i].d));
+}
 
   }
  }
@@ -424,20 +432,18 @@
       .on('initialize path array', function (initial_global_path,id,x,y) {
          redraw_path=initial_global_path;
          redraw(id,x,y);
-      console.log("in new emit",redraw_path);
+      //console.log("in new emit",redraw_path);
         var relations_on_canvas = document.getElementsByTagName('path');
         //console.log(document.getElementsByTagName('path'));
         var screen_relations=[];
-        //for (var z=0;z<redraw_canvas.length; z++)
-        //{
-          //screen_relations.push(relations_on_canvas[z].getAttribute('id'));
-        //}
 
       })
 
   </script>
 <script src="trycapture.js"></script>
 <script type="text/javascript">
+
+
 var global_obj=[];
 
 //console.log(global_obj);
@@ -448,7 +454,7 @@ socket
     global_array = initial_global_array;
     global_move = initial_global_move;
     //console.log("moving array",global_move);
-
+})//moves
 var c = d3.select("#main_svg");
       socket
       .on('initialize move',function(data){
@@ -468,33 +474,28 @@ var c = d3.select("#main_svg");
       }//moves for loop
 
 
-})//moves
+var parser = new DOMParser();
 
+for(var foo=global_array.length-1; foo>=0;foo--)
+{
+if(!global_move.hasOwnProperty(global_obj[foo]))
+{
+//console.log(parser);
+//console.log(global_array);
+  var doc = parser.parseFromString(global_array[foo].obj, "image/svg+xml");
 
-console.log(global_obj);
+  //console.log(i);
+  var type = doc.getElementsByTagName('svg')[0].getAttribute("data");
+  var x = doc.getElementsByTagName('svg')[0].getAttribute("x");
+  var y = doc.getElementsByTagName('svg')[0].getAttribute("y");
+  var id = doc.getElementsByTagName('svg')[0].getAttribute("id");
+  if(type == "BusinessProductFigure"){
+  BusinessProductFigure.prototype.addTo(c,x,y,id);
+  }
 
+}
 
-
-
-    parser = new DOMParser();
-    //console.log(global_array);
-    for(var i=0; i<global_array.length; i++){
-    var doc = parser.parseFromString(global_array[i].obj, "image/svg+xml");
-    //console.log(i);
-    var type = doc.getElementsByTagName('svg')[0].getAttribute("data");
-    var x = doc.getElementsByTagName('svg')[0].getAttribute("x");
-    var y = doc.getElementsByTagName('svg')[0].getAttribute("y");
-    var id = doc.getElementsByTagName('svg')[0].getAttribute("id");
-    if(type == "BusinessProductFigure"){
-
-
-      BusinessProductFigure.prototype.addTo(c,x,y,id);
-
-
-      //console.log(arrayObjectIndexOfall(global_move, id, "id"));
-    }
-  }//EOF for loop
-
+}//for loop end
 
 })
 
@@ -530,11 +531,6 @@ createSVGtext(d3.select("#"+unique_global_text[i].id), unique_global_text[i].tex
           .attr("y",unique_global_text[i].coords.y);*/
 
         }
-         //console.log(global_text);
-        // webarch.createSVGtext(global_text[0].id, global_text[0].text, global_text[0].coords.x, global_text[0].coords.y);
-        //var try_obj = new trycapture;
-        //if(global_paths==''){}else{
-        //try_obj.drawAggregate(global_paths[0].x1,global_paths[0].y1,global_paths[0].x2,global_paths[0].y2,global_paths[0].id);}
       }})
 just_moved='';
 //Trying to move paths around
@@ -567,6 +563,7 @@ var x_value= document.getElementsByTagName("svg")[id].getAttribute("x");
           }
           return arrayoftoelements;
       }
+
 
 
 
