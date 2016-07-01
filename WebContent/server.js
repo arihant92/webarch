@@ -4,6 +4,9 @@ var fs = require('fs');
 var url = require('url');
 var path = require('path');
 var mysql      = require('mysql');
+var middleware = require('socketio-wildcard')();
+io.use(middleware);
+
 var connection = mysql.createConnection({
   host     : 'localhost',
   user     : 'root',
@@ -58,9 +61,21 @@ var outgoingEmits = [];
 })();
 
 
-	io.on('connection', function(socket){
+	io.sockets.on('connection', function(socket){
+    socket.on('room', function(room) {
+        socket.join(room);
+        console.log(room);
+        io.sockets.in(room).emit('testing', 'testing');
+
+    });
+
+
+  //io.sockets.in(room).emit('testing', 'what is going on, party people?');
+
 		socket.on('event', function(data){
-			console.log(data);
+			//console.log(data);
+
+
 			//console.log(io.sockets.sockets[0].id);
 			socket.emit('initialize array', global_array,global_move);
 			socket.emit('initialize path', global_paths);

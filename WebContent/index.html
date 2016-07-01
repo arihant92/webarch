@@ -11,6 +11,7 @@
 <link href="css/bootstrap.min.css" rel="stylesheet"/>
 <link href="css/webarch.css" rel="stylesheet"/>
   <script src="https://d3js.org/d3.v3.js" charset="utf-8"></script>
+  <script src="http://localhost:3000/node_modules/socket.io/node_modules/socket.io-client/socket.io.js"></script>
 <script type="text/javascript">
 
   var global_array=[];
@@ -19,10 +20,15 @@
   var redraw_path=[];
   var global_move={};
   var session=Math.random().toString(36).slice(-12);
+
+
+// piggyback using the event-emitter bundled with socket.io client
+
+
 </script>
+
   <script src="https://togetherjs.com/togetherjs-min.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jsPlumb/2.0.7/jsPlumb.js"></script>
 
 
 
@@ -99,7 +105,7 @@
 			<!-- Collect the nav links, forms, and other content for toggling -->
 			<div class="collapse navbar-collapse"
 				id="bs-example-navbar-collapse-1">
-				<button type="button" class="btn btn-default navbar-btn">Sign
+			<!--	<button type="button" class="btn btn-default navbar-btn">Sign
 					in</button>
 				<button type="button" class="btn btn-default navbar-btn">Sign
 					in</button>
@@ -108,7 +114,7 @@
 				<button type="button" class="btn btn-default navbar-btn">Sign
 					in</button>
 				<button type="button" class="btn btn-default navbar-btn">Sign
-					in</button>
+					in</button>-->
 
 
 			</div>
@@ -160,7 +166,7 @@
 			<div class="col-md-8">
 				<div class="panel panel-default">
 					<div class="panel-body">
-						<div id="svg_editor" style="width:100%; height:500px; border: 10px solid black; overflow:auto" >
+						<div id="svg_editor" style="width:100%; height:500px; border: 10px solid white; overflow:auto" >
 
 						</div>
 					</div>
@@ -380,9 +386,6 @@
 	<!-- Archimate Files -->
   <script src="js/archimate/Figure.js"></script>
 	<script src="js/archimate/webarch.js"></script>
-
-
-
 	<script src="js/archimate/BusinessContractFigure.js"></script>
 	<script src="js/archimate/BusinessProductFigure.js"></script>
 	<script src="js/archimate/line.js"></script>
@@ -390,7 +393,6 @@
 	<script src="js/archimate/RelationshipAssociation.js"></script>
   <script src="js/archimate/mousetrap.min.js"></script>
   <script src="js/archimate/persistence.js"></script>
-
 	<script src="js/main.js"></script>
   <button onclick="TogetherJS(this); return false;">Collaborate</button>
   <button id="clear" >Clear Canvas</button>
@@ -401,14 +403,16 @@
   </form>
   <script type="text/javascript">
     function persist(){
+      d3.select("#main_svg").selectAll("*").remove();
       var session_number=document.getElementById('session_number').value;
         socket.emit('persist',{session:session_number});
         session=session_number;
+        document.getElementById('current_session').innerHTML="Current Session ID: "+session;
       return false;
     }
   </script>
 
-  <h4>Current Session ID: <script type="text/javascript">document.write(session)</script></h4>
+  <h4 id="current_session">Current Session ID: <script type="text/javascript">document.write(session)</script></h4>
 <script type="text/javascript">
 document.getElementById("clear").onclick= function(){
 socket.emit("clear");
@@ -491,11 +495,17 @@ document.getElementById(data.id).setAttribute("d",lineFunction(lineData));
 
 });
 
+socket.on('testing',function(msg){
+  console.log(msg);
+})
+
 
 
 var global_obj=[];
 
 //console.log(global_obj);
+
+
 
 
 socket

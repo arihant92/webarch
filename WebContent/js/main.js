@@ -128,28 +128,30 @@ function defaultCursor(){
 
 setupSpace();
 
+
+
 //connect to the server
 var socket = io();
 socket.emit('event', {d: "I'm Here!",session:session});
 console.log('connected');
 
-socket.on('change', webarch.processChange);
+
+socket.emit('room', session);
+
+socket.on('change', function(d){if(d.session==session){webarch.processChange(d)}});
 socket.on('move', webarch.processMove);
 socket.on('text-change', webarch.processTextChange);
 socket.on('make-path', function(data){
-
+if(data.session==session){
 var emit_x1=data.x1;
 var emit_y1=data.y1;
 var emit_x2=data.x2;
 var emit_y2=data.y2;
 var new_id=data.id;
 var try_obj = new trycapture;
-//console.log(try_obj);
-
-
 
 drawAggregate(emit_x1,emit_y1,emit_x2,emit_y2,new_id);
-
+}
  });
 //var bcf = new BusinessContractFigure();
 //bcf.addTo(drawing, 0, 0);
