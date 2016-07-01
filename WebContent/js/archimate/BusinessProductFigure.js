@@ -29,14 +29,14 @@ BusinessProductFigure.prototype.addTo = function(c, x0, y0, id) {
 			              //console.log("dropped");
 			              myglobal.moveflag = false;
 										socket.emit("redraw",{id:this.id,x:this.x.baseVal.value,y:this.y.baseVal.value});
-										socket.emit("initialize move",{id:this.id,x:this.x.baseVal.value,y:this.y.baseVal.value})
+										socket.emit("initialize move",{relation:'figure',id:this.id,x:this.x.baseVal.value,y:this.y.baseVal.value})
 											//redraw(this.id,this.x.baseVal.value,this.y.baseVal.value);
 
 			          } else {
 			              //console.log("clicked");
 			          }
 			      }
-
+//console.log(session);
 
 
 //alert("evenonclick");

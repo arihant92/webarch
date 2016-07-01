@@ -130,8 +130,9 @@ setupSpace();
 
 //connect to the server
 var socket = io();
-socket.emit('event', {d: "I'm Here!"});
+socket.emit('event', {d: "I'm Here!",session:session});
 console.log('connected');
+
 socket.on('change', webarch.processChange);
 socket.on('move', webarch.processMove);
 socket.on('text-change', webarch.processTextChange);

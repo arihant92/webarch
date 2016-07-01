@@ -5,7 +5,7 @@ linea.prototype.constructor = linea;
 
 linea.prototype.getTextCoords = function(){
   //alert("in here!!!");
-   return {x: 200, y:200};
+   return {x: 0, y:0};
   }
 
 
@@ -142,7 +142,7 @@ var lineFunction = d3.svg.line()
                         .interpolate("step");
 //emitting path to server
 //repeating
-socket.emit('make-path',{ id:drawAggregate.new_id, x1: closest.a[0], y1:closest.a[1] ,x2:closest.b[0],y2: closest.b[1] ,path_type:"aggregate",from:a1,to:a2,id:path_id,d:lineFunction(lineData)});
+socket.emit('make-path',{ id:drawAggregate.new_id, x1: closest.a[0], y1:closest.a[1] ,x2:closest.b[0],y2: closest.b[1] ,path_type:"aggregate",from:a1,to:a2,id:path_id,d:lineFunction(lineData),session:session});
 
 Mousetrap.bind('command+e', function(e) {
    drawAggregate(closest.b[0],closest.b[1],closest.a[0],closest.a[1]);
@@ -302,8 +302,12 @@ var lineFunction = d3.svg.line()
   //console.log(position);
   document.getElementById(redraw_path[position[counter]].id).setAttribute("d",lineFunction(lineData));
   socket.emit('move',{id:redraw_path[position[counter]].id,d:lineFunction(lineData)});
-var chanhge_location=(arrayObjectIndexOfall(global_paths,redraw_path[position[counter]].id,"id"));
-socket.emit('update redraw',{location:chanhge_location, d:lineFunction(lineData)});
+var change_location=(arrayObjectIndexOfall(global_paths,redraw_path[position[counter]].id,"id"));
+socket.emit('update redraw',{location:change_location, d:lineFunction(lineData)});
+
+socket.emit('initialize move',{relation:'to',x2:closest.b[0],y2:closest.b[1]});
+
+
     }// for loop end
 }
 
@@ -362,6 +366,7 @@ var chanhge_location=(arrayObjectIndexOfall(global_paths,redraw_path[position[co
 //console.log(global_paths[chanhge_location].d=lineFunction(lineData));
 //console.log("update redraw");
 socket.emit('update redraw',{location:chanhge_location, d:lineFunction(lineData)});
+socket.emit('initialize move',{relation:'from',x1:closest.a[0],y1:closest.a[1]});
 }// for loop end
 }
 

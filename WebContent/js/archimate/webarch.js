@@ -13,7 +13,8 @@ function WebArch(){
 WebArch.prototype.changeElement = function(xtype, t){
 	var idm = t.attr("id");
 	var jsn = xser.serializeToString(t[0][0]);
-	socket.emit(xtype,{id:idm, obj:jsn});
+	socket.emit(xtype,{id:idm, obj:jsn,session});
+  //console.log(session);
 }
 
 //

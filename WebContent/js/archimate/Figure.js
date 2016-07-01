@@ -41,6 +41,7 @@ Figure.prototype.mouseOut = function(d){
 }
 
 Figure.prototype.editText = function(){
+
 	var target = d3.select(this);
 
 	var cx = target.attr("x");
